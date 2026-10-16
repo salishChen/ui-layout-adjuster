@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>UI 布局调节器</title>
+<script>__PREFERENCES_JS__</script>
+<style>
+:root{color-scheme:dark;--bg:#15191c;--panel:#1d2327;--line:#323a40;--muted:#8f9da6;--text:#e5ecef;--accent:#b3eccb;--field:#151b1f;--button:#252d32;--hover:#303b40;--chrome:#1b2125;--heading:#bac8cf;--selected:#33483c;--selected-text:#d8f4e3;--viewport:#111619;--dot:#323c41;--source-text:#a1b3ba;--source-bg:#151c20;--badge:#253b31;--badge-border:#355845;--recovery:#3a3523;--recovery-text:#eee0ad;--recovery-border:#665d37;--unsaved:#f4d68e;--guide:#f392e3}
+html[data-theme=light]{color-scheme:light;--bg:#edf1f0;--panel:#ffffff;--line:#d8e1dc;--muted:#61756a;--text:#233b2c;--accent:#2c8052;--field:#f5f8f6;--button:#f0f5f2;--hover:#e3eee7;--chrome:#ffffff;--heading:#415e4d;--selected:#dcefe2;--selected-text:#1f5837;--viewport:#e7eeea;--dot:#bfcec5;--source-text:#526b5c;--source-bg:#f0f5f2;--badge:#e2f4e8;--badge-border:#b8d7c3;--recovery:#fff4d5;--recovery-text:#765b13;--recovery-border:#dfc985;--unsaved:#976614;--guide:#bd2b9d}
+:root{--scroll-thumb:rgba(174,194,185,.24);--scroll-thumb-hover:rgba(174,194,185,.42)}html[data-theme=light]{--scroll-thumb:rgba(96,129,109,.19);--scroll-thumb-hover:rgba(96,129,109,.36)}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--scroll-thumb) transparent}::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track,::-webkit-scrollbar-corner{background:transparent}::-webkit-scrollbar-thumb{background:var(--scroll-thumb);border:1px solid transparent;border-radius:6px;background-clip:padding-box}::-webkit-scrollbar-thumb:hover{background-color:var(--scroll-thumb-hover)}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.5 "Segoe UI","Microsoft YaHei",sans-serif;height:100vh;overflow:hidden}
+button,input,select,textarea{font:inherit}button{border:1px solid var(--line);border-radius:6px;background:var(--button);color:var(--text);padding:7px 10px;cursor:pointer}button:hover{border-color:#768c80;background:var(--hover)}button:disabled{opacity:.35;cursor:default}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.primary{background:#b3eccb;color:#173727;border-color:#b3eccb;font-weight:600}.primary:hover{background:#cef5dd}.danger:hover{color:#ffaaa4;border-color:#ae706c}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:5px;padding:7px 8px;color:var(--text);background:var(--field);min-width:0}textarea{resize:vertical;min-height:62px}input[type=checkbox]{width:auto;accent-color:#8bd9a9}input[type=range]{padding:0;accent-color:#8bd9a9}
+.toolbar{height:66px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid var(--line);background:var(--chrome)}.logo{width:30px;height:30px;border:1px solid #8dcfa8;border-radius:8px;display:grid;place-items:center;color:var(--accent);font-size:19px}.title-group{margin-right:20px;min-width:165px}.app-title{font-weight:600;letter-spacing:.5px}.subtitle{color:var(--muted);font-size:10px;letter-spacing:1.5px}.divider{height:24px;border-left:1px solid var(--line);margin:0 3px}.spacer{flex:1}
+.badge{font-size:11px;color:var(--accent);padding:3px 8px;background:var(--badge);border:1px solid var(--badge-border);border-radius:20px}.toolbar input{width:58px;padding:5px}.toolbar select{width:88px}.toolbar label{color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.layout{--left-width:218px;--right-width:278px;display:grid;grid-template-columns:var(--left-width) minmax(240px,1fr) var(--right-width);height:calc(100vh - 142px)}.sidebar{background:var(--panel);overflow:auto;min-width:0}.left{grid-column:1;border-right:1px solid var(--line)}.viewport{grid-column:2}.right{grid-column:3;border-left:1px solid var(--line)}
+html[data-left-collapsed=true] .layout{--left-width:0px}html[data-right-collapsed=true] .layout{--right-width:0px}.panel-toggle{flex-shrink:0;width:28px;padding:2px;font-size:20px;line-height:24px}
+.section{padding:16px;border-bottom:1px solid var(--line)}.section-title{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:1px;color:var(--heading);margin:0 0 12px}.quiet{color:var(--muted);font-size:11px}.palette{display:grid;grid-template-columns:1fr 1fr;gap:7px}.palette button{text-align:left;font-size:12px;padding:10px}.palette button span{display:inline-block;width:22px;color:var(--accent)}
+.layers{padding:4px 8px 20px}.layer{width:100%;display:flex;align-items:center;gap:7px;text-align:left;border:0;background:transparent;border-radius:4px;padding:7px 6px;font-size:12px;white-space:nowrap;overflow:hidden}.layer.selected{background:var(--selected);color:var(--selected-text)}.layer small{color:var(--muted);font-size:10px;flex-shrink:0}.layer b{font-weight:400;overflow:hidden;text-overflow:ellipsis}.layer-tag{color:var(--muted);width:14px;flex-shrink:0}
+.viewport{position:relative;overflow:auto;overflow-anchor:none;background-color:var(--viewport);background-image:radial-gradient(var(--dot) 1px,transparent 1px);background-size:16px 16px;padding:46px 42px 80px}.stage{position:relative;margin:0 auto}.artboard{position:absolute;left:0;top:0;transform-origin:0 0;box-shadow:0 12px 60px #0005;isolation:isolate;color-scheme:light}.canvas-label{position:absolute;left:0;top:-26px;font-size:11px;color:var(--muted);letter-spacing:.8px;white-space:nowrap}.surface{position:relative;min-height:100%;width:100%;isolation:isolate}.reference{position:absolute;left:0;top:0;width:100%;height:100%;object-fit:contain;object-position:top left;z-index:9990;pointer-events:none;display:none}
+.selection{position:absolute;border:1.5px solid #39b97e;pointer-events:none;z-index:10000;display:none;box-sizing:border-box}.selection-label{position:absolute;left:-1px;bottom:100%;background:#297e57;color:#fff;padding:2px 6px;white-space:nowrap;font-size:10px;max-width:250px;overflow:hidden;text-overflow:ellipsis}.handle{position:absolute;width:8px;height:8px;background:#d7ffe8;border:1px solid #2da66d;pointer-events:auto;transform:translate(-50%,-50%)}.handle[data-dir=nw]{left:0;top:0;cursor:nwse-resize}.handle[data-dir=n]{left:50%;top:0;cursor:ns-resize}.handle[data-dir=ne]{left:100%;top:0;cursor:nesw-resize}.handle[data-dir=e]{left:100%;top:50%;cursor:ew-resize}.handle[data-dir=se]{left:100%;top:100%;cursor:nwse-resize}.handle[data-dir=s]{left:50%;top:100%;cursor:ns-resize}.handle[data-dir=sw]{left:0;top:100%;cursor:nesw-resize}.handle[data-dir=w]{left:0;top:50%;cursor:ew-resize}
+.field{display:block;margin:10px 0}.field>span{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.row{display:grid;grid-template-columns:1fr 1fr;gap:8px}.row .field{margin:6px 0}.mini-actions{display:flex;gap:6px;margin-top:12px}.mini-actions button{flex:1;font-size:12px;padding:6px}.source-box{font:11px/1.7 Consolas,monospace;color:var(--source-text);overflow-wrap:anywhere;white-space:pre-wrap;padding:10px;background:var(--source-bg);border-radius:5px}.note{font-size:11px;color:var(--muted);line-height:1.7}.property-label{font-size:15px;font-weight:600;margin:0 0 4px}.empty{padding:25px 16px;color:var(--muted)}
+.statusbar{height:34px;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 18px;background:var(--chrome);border-top:1px solid var(--line);font-size:11px;color:var(--muted)}#status{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.toast{position:fixed;left:50%;bottom:56px;transform:translateX(-50%);background:#d6f4e2;color:#234333;padding:11px 18px;border-radius:8px;box-shadow:0 8px 30px #0004;z-index:20000;max-width:70vw;display:none}.toast.error{background:#f2d5d1;color:#692e29}
+.recovery{display:none;background:var(--recovery);color:var(--recovery-text);padding:10px 16px;position:absolute;left:12px;right:12px;top:10px;z-index:12000;border:1px solid var(--recovery-border);border-radius:7px;font-size:12px}.recovery button{margin-left:8px;padding:3px 8px}
+details summary{font-size:12px;color:var(--heading);cursor:pointer}#css-json{font:11px/1.6 Consolas,monospace;min-height:120px;margin-top:10px}#import-file{display:none}
+[hidden]{display:none!important}.surface{height:100%}.child-frame{display:block;width:100%;height:100%;border:0;background:transparent;color-scheme:light}
+.palette button{padding:9px 6px;white-space:nowrap}.palette button span{width:16px}
+.palette button[draggable=true]{cursor:grab}.palette button[draggable=true]:active{cursor:grabbing}.drop-target{display:none;position:absolute;pointer-events:none;border:1.5px dashed var(--accent);z-index:11000;box-sizing:border-box}.drop-marker{display:none;position:absolute;pointer-events:none;z-index:11001;border:1px solid #fff;border-radius:50%;background:#297e57;transform:translate(-50%,-50%)}.drop-label{position:absolute;left:100%;top:100%;background:#297e57;color:#fff;white-space:nowrap;border-radius:4px}
+.palette button span[data-i18n]{width:auto}.media-preview{display:block;width:100%;max-height:180px;object-fit:contain;margin-top:12px;border-radius:7px;background:var(--field)}#media-file{display:none}#preview-mode[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
+@media(max-width:1050px){.layout{--left-width:170px;--right-width:240px;grid-template-columns:var(--left-width) minmax(220px,1fr) var(--right-width)}.toolbar{gap:6px;padding:0 10px}.title-group{min-width:120px;margin-right:0}.toolbar .optional{display:none}.section{padding:12px}.viewport{padding:42px 28px 70px}}
+.settingsbar{height:42px;display:flex;align-items:center;gap:20px;padding:0 20px;background:var(--panel);border-bottom:1px solid var(--line)}.settingsbar label{display:flex;align-items:center;gap:8px;white-space:nowrap;color:var(--muted);font-size:12px}.settingsbar select{width:132px;padding:4px 8px}.settingsbar input{width:auto}.guide{display:none;position:absolute;z-index:9998;pointer-events:none;border-color:var(--guide);border-style:dashed;border-width:0}.guide.vertical{width:0;border-left-width:1px}.guide.horizontal{height:0;border-top-width:1px}
+html[data-theme=light] .primary{background:#2c8052;color:#fff;border-color:#2c8052}html[data-theme=light] .primary:hover{background:#236a44}
+@media(max-width:1050px){.settingsbar{gap:14px;padding:0 10px}.settingsbar select{width:120px}.toolbar button{padding:7px}.statusbar>span:last-child{display:none}}
+</style>
+</head>
+<body>
+<header class="toolbar">
+  <div class="logo" aria-hidden="true">▦</div><div class="title-group"><div class="app-title"><span data-i18n="UI 布局调节器">UI 布局调节器</span></div><div class="subtitle">LAYOUT WORKBENCH</div></div>
+  <button id="undo" title="撤销 Ctrl+Z" data-i18n-title="撤销 Ctrl+Z">↶</button><button id="redo" title="重做 Ctrl+Shift+Z" data-i18n-title="重做 Ctrl+Shift+Z">↷</button><div class="divider"></div>
+  <label><span data-i18n="画布">画布</span><input id="canvas-w" type="number" min="200" max="10000" aria-label="画布宽度" data-i18n-aria="画布宽度"> × <input id="canvas-h" type="number" min="200" max="10000" aria-label="画布高度" data-i18n-aria="画布高度"></label>
+  <select id="zoom" aria-label="画布缩放" data-i18n-aria="画布缩放" title="Ctrl＋滚轮缩放工作区（20%–400%）" data-i18n-title="Ctrl＋滚轮缩放工作区（20%–400%）"><option value=".2">20%</option><option value=".35">35%</option><option value=".5">50%</option><option value=".65">65%</option><option value=".8">80%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option><option value="4">400%</option></select>
+  <button id="fit"><span data-i18n="适合窗口">适合窗口</span></button><label class="optional"><input id="snap" type="checkbox" checked><span data-i18n="吸附 8px">吸附 8px</span></label>
+  <div class="spacer"></div><span id="dirty" class="badge"><span data-i18n="已保存">已保存</span></span><button id="export" class="optional"><span data-i18n="导出 JSON">导出 JSON</span></button><button id="save" class="primary"><span data-i18n="保存布局">保存布局</span></button>
+</header>
+<div class="settingsbar" role="group" aria-label="编辑器设置" data-i18n-aria="编辑器设置">
+  <button id="toggle-left" class="panel-toggle" aria-controls="left-sidebar" aria-expanded="true" aria-label="收起左侧栏" title="收起左侧栏">‹</button>
+  <label><span data-i18n="主题">主题</span><select id="theme-mode" aria-label="主题" data-i18n-aria="主题"><option value="auto" data-i18n="跟随浏览器">跟随浏览器</option><option value="dark" data-i18n="深色">深色</option><option value="light" data-i18n="浅色">浅色</option></select></label>
+  <label><span data-i18n="语言">语言</span><select id="language-mode" aria-label="语言" data-i18n-aria="语言"><option value="auto" data-i18n="跟随浏览器">跟随浏览器</option><option value="zh">中文</option><option value="en">English</option></select></label>
+  <label title="拖动和缩放时显示对齐虚线，并吸附组件边缘与中心" data-i18n-title="拖动和缩放时显示对齐虚线，并吸附组件边缘与中心"><input id="guides" type="checkbox" checked><span data-i18n="对齐辅助线">对齐辅助线</span></label>
+  <div class="spacer"></div><button id="preview-mode" aria-pressed="false">预览交互</button><button id="toggle-right" class="panel-toggle" aria-controls="inspector" aria-expanded="true" aria-label="收起右侧栏" title="收起右侧栏">›</button>
+</div>
+<div class="layout">
+  <aside id="left-sidebar" class="sidebar left">
+    <section class="section"><div class="section-title"><span data-i18n="添加组件">添加组件</span><span class="quiet">＋</span></div>
+      <div class="palette">
+        <button data-add="text"><span>T</span><span data-i18n="文本">文本</span></button><button data-add="button"><span>▰</span><span data-i18n="按钮">按钮</span></button>
+        <button data-add="container"><span>□</span><span data-i18n="容器">容器</span></button><button data-add="card"><span>▤</span><span data-i18n="卡片">卡片</span></button>
+        <button data-add="input"><span>▭</span><span data-i18n="输入框">输入框</span></button><button data-add="image"><span>▧</span><span data-i18n="图片">图片</span></button>
+        <button data-add="rectangle"><span>■</span><span data-i18n="色块">色块</span></button><button data-add="divider"><span>―</span><span data-i18n="分隔线">分隔线</span></button>
+        <button data-add="carousel"><span>▣</span><span data-i18n="轮播图">轮播图</span></button><button data-add="select"><span>⌄</span><span data-i18n="选择框">选择框</span></button>
+        <button data-add="time"><span>◷</span><span data-i18n="时间选择器">时间选择器</span></button><button data-add="accordion"><span>▾</span><span data-i18n="折叠面板">折叠面板</span></button>
+        <button data-add="pagination"><span>⋯</span><span data-i18n="分页">分页</span></button><button data-add="video"><span>▶</span><span data-i18n="视频">视频</span></button>
+      </div>
+      <p class="note"><span data-i18n="点击添加到当前容器，或拖动组件到画布指定位置。">点击添加到当前容器，或拖动组件到画布指定位置。</span></p>
+    </section>
+    <section class="section"><div class="section-title"><span data-i18n="会话">会话</span><span id="kind" class="quiet"></span></div>
+      <label class="field"><span><span data-i18n="界面名称">界面名称</span></span><input id="session-title"></label>
+      <label class="field"><span><span data-i18n="画布背景">画布背景</span></span><input id="canvas-bg"></label>
+      <button id="import" style="width:100%"><span data-i18n="导入布局 JSON">导入布局 JSON</span></button><input id="import-file" type="file" accept=".json,application/json">
+      <label class="field" id="reference-field" hidden><span><span data-i18n="参考图透明度">参考图透明度</span></span><input id="reference-opacity" type="range" min="0" max="100" value="0"></label>
+    </section>
+    <section class="section" style="border-bottom:0"><div class="section-title"><span data-i18n="图层">图层</span><span id="node-count" class="quiet"></span></div></section>
+    <div id="layers" class="layers" aria-label="图层" data-i18n-aria="图层"></div>
+  </aside>
+  <main id="viewport" class="viewport" aria-label="布局画布" data-i18n-aria="布局画布">
+    <div id="recovery" class="recovery"><span id="recovery-message" data-i18n="发现尚未保存的本地草稿。">发现尚未保存的本地草稿。</span><button id="recover"><span data-i18n="恢复草稿">恢复草稿</span></button><button id="discard-draft"><span data-i18n="忽略">忽略</span></button></div>
+    <div id="stage" class="stage"><div id="canvas-label" class="canvas-label"></div>
+      <div id="artboard" class="artboard"><div id="surface" class="surface"><iframe id="child-frame" class="child-frame" title="选定界面（子页面）" data-i18n-title="选定界面（子页面）" sandbox="allow-same-origin"></iframe></div><img id="reference" class="reference" alt="界面参考图" data-i18n-alt="界面参考图">
+        <div id="guide-x" class="guide vertical" aria-hidden="true"></div><div id="guide-y" class="guide horizontal" aria-hidden="true"></div>
+        <div id="drop-target" class="drop-target" aria-hidden="true"></div><div id="drop-marker" class="drop-marker" aria-hidden="true"><span id="drop-label" class="drop-label"></span></div>
+        <div id="selection" class="selection"><div id="selection-label" class="selection-label"></div>
+          <i class="handle" data-dir="nw"></i><i class="handle" data-dir="n"></i><i class="handle" data-dir="ne"></i><i class="handle" data-dir="e"></i><i class="handle" data-dir="se"></i><i class="handle" data-dir="s"></i><i class="handle" data-dir="sw"></i><i class="handle" data-dir="w"></i>
+        </div>
+      </div>
+    </div>
+  </main>
+  <aside id="inspector" class="sidebar right" aria-label="元素属性" data-i18n-aria="元素属性"></aside>
+</div>
+<footer class="statusbar"><span id="status"><span data-i18n="正在初始化…">正在初始化…</span></span><span><span data-i18n="拖动移动 · 拖角缩放 · Ctrl+滚轮缩放 · Ctrl+S 保存">拖动移动 · 拖角缩放 · Ctrl+滚轮缩放 · Ctrl+S 保存</span></span></footer>
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<input id="media-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp,image/avif,video/mp4,video/webm,video/ogg">
+<script id="bootstrap" type="application/json">__BOOTSTRAP__</script>
+<script>__ALIGNMENT_JS__</script>
+<script>__EDITOR_JS__</script>
+</body></html>

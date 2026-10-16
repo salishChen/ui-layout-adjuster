@@ -1,0 +1,4 @@
+interface:
+  display_name: "UI 布局调节器"
+  short_description: "说“使用布局调节器调节xx页面”或“调节xx页面布局”，可视化编辑并回写源码"
+  default_prompt: "使用布局调节器调节当前页面（$ui-layout-adjuster），保存后将改动应用回原界面。"
